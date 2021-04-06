@@ -1,0 +1,149 @@
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    video {
+      width: 100vw;
+      min-width: 100%;
+      height: 100vh;
+      min-height:100%;
+    }
+    .flex-grid {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      z-index: 1;
+    }
+    .col-1 {
+      flex: 1;
+    }
+    .col-2 {
+      flex: 2;
+    }
+  </style>
+  <script>
+var app = (function() {
+    var ratioWidth = 16;
+    var ratioHeight = 9;
+    
+    var ratioCheck = function() {
+      var ratio = window.innerHeight / window.innerWidth;
+      
+      if (ratio > 0.562) {
+        handleHeightCentricDisplay();
+      } else if (ratio < 0.562) {
+        handleWidthCentricDisplay(); 
+      }
+    };
+
+    var handleHeightCentricDisplay = function() {
+      var windowHeight = window.innerHeight;
+      var newVideoWidth = ratioWidth * windowHeight / ratioHeight;
+      let video = document.getElementsByTagName("video")[0];
+      video.style.height = windowHeight;
+      video.style.width = newVideoWidth;
+      video.style.left = (newVideoWidth - window.innerWidth) / 2 * -1;
+    };
+    
+    var handleWidthCentricDisplay = function() {
+      var windowWidth = window.innerWidth;
+      var windowHeight = window.innerHeight;
+      var newVideoHeight = ratioHeight * windowWidth / ratioWidth;
+      let video = document.getElementsByTagName("video")[0];
+      video.style.height = newVideoHeight;
+      video.style.width = windowWidth;
+      video.style.left = 0;
+      video.style.top = (newVideoHeight - windowHeight) / 2 * -1;
+    };
+
+    var listenForVideoResize = function() {
+      window.addEventListener('resize', function() {
+        ratioCheck();
+        setTimeout(() => {
+          resetCSS();
+        },0);
+      });
+    };
+
+    var init = function() {
+      ratioCheck();
+      listenForVideoResize();
+    };
+
+    function resetCSS() {
+      document.getElementsByClassName("flex-grid")[0].style.setProperty('width', '100vw');
+    }
+
+    //------------- CONTROLS -------------
+    let i = 0;
+    let videos = [
+      "stockvideo_01171.mp4",
+      "number_digital_background.mp4",
+      "24333 Sky Of Stars Hd Bg-1.mp4",
+      "alb_ocen0108_1080p-1.mp4",
+      "stockfootage0920.mp4",
+      "alb_smokfx1019_1080p_24fps-1.mp4",
+      "stockfootage0821.mp4"
+    ];
+    function nextVideo() {
+      i = (i + 1) % videos.length;
+      loadVideo();
+    }
+    function previousVideo() {
+      i--;
+      if(i < 0) i = videos.length - 1;
+      loadVideo();
+    }
+    function loadVideo() {
+      let video = document.getElementsByTagName("video")[0];
+      let source = document.getElementsByTagName("source")[0];
+      source.setAttribute('src', videos[i]);
+      video.load();
+      video.play();
+    }
+    function toggleFullscreen() {
+      console.log("toggling fullscreen");
+      if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+    //------------------------------------
+
+    return {
+      init,
+      ratioCheck,
+      previousVideo,
+      nextVideo,
+      toggleFullscreen
+    };
+  })();
+
+  window.addEventListener('load', function() {
+    app.init();
+    setTimeout(() => {
+      app.ratioCheck();
+    }, 0);
+  });
+  </script>
+</head>
+<body>
+<div class="flex-grid">
+  <div class="col-1" onclick="app.previousVideo()"></div>
+  <div class="col-2" onclick="app.toggleFullscreen()"></div>
+  <div class="col-1" onclick="app.nextVideo()"></div>
+</div>
+<video autoplay loop muted>
+  <source src="stockvideo_01171.mp4">
+  Your browser does not support the video tag.
+</video>
+</body>
+</html>
